@@ -11,10 +11,18 @@ const JUMP_FORCE = -12.2;
 
 const keys = {};
 
-// Level definitions - each level has platforms, enemies, and goal position
+// Level definitions - each level has platforms, enemies, goal position, and theme
 const levels = [
   {
     name: 'Level 1: Sky Sprint',
+    description: "Ziggy's first adventure through the clouds!",
+    bgColor1: '#7ec8ff',
+    bgColor2: '#d5eeff',
+    bgColor3: '#f7fbff',
+    skyColor: '#bfe8ff',
+    cloudColor: 'rgba(255,255,255,0.70)',
+    hillColor1: '#9ad5a6',
+    hillColor2: '#6aa96a',
     platforms: [
       { x: 0, y: 490, w: 520, h: 50 },
       { x: 620, y: 490, w: 360, h: 50 },
@@ -45,6 +53,14 @@ const levels = [
   },
   {
     name: 'Level 2: Mountain Maze',
+    description: 'Navigate through the rocky peaks!',
+    bgColor1: '#ff8c42',
+    bgColor2: '#ffb380',
+    bgColor3: '#ffd4a3',
+    skyColor: '#ffe5b4',
+    cloudColor: 'rgba(255,250,240,0.60)',
+    hillColor1: '#d2691e',
+    hillColor2: '#8b4513',
     platforms: [
       { x: 0, y: 490, w: 300, h: 50 },
       { x: 400, y: 490, w: 300, h: 50 },
@@ -77,6 +93,14 @@ const levels = [
   },
   {
     name: 'Level 3: Cloud Kingdom',
+    description: 'The final challenge awaits in the mystical clouds!',
+    bgColor1: '#b19cd9',
+    bgColor2: '#d8bfd8',
+    bgColor3: '#ffe4e1',
+    skyColor: '#e6d7f0',
+    cloudColor: 'rgba(230,215,240,0.80)',
+    hillColor1: '#9370db',
+    hillColor2: '#8a5ec5',
     platforms: [
       { x: 0, y: 490, w: 250, h: 50 },
       { x: 350, y: 350, w: 250, h: 50 },
@@ -119,14 +143,16 @@ const game = {
   timer: 0,
   levelMessage: '',
   resetTimer: 0,
-  currentLevelIndex: 0
+  currentLevelIndex: 0,
+  gameState: 'menu',
+  celebrationTimer: 0
 };
 
 const player = {
   x: 80,
   y: 260,
-  w: 32,
-  h: 42,
+  w: 40,
+  h: 50,
   vx: 0,
   vy: 0,
   onGround: false,
@@ -142,14 +168,15 @@ const player = {
 let platforms = [];
 let enemies = [];
 let goal = {};
+let currentLevel = null;
 
 function loadLevel(levelIndex) {
   game.currentLevelIndex = levelIndex;
-  const level = levels[levelIndex];
+  currentLevel = levels[levelIndex];
   
-  platforms = JSON.parse(JSON.stringify(level.platforms));
-  enemies = JSON.parse(JSON.stringify(level.enemies));
-  goal = { ...level.goal, w: 30, h: 87 };
+  platforms = JSON.parse(JSON.stringify(currentLevel.platforms));
+  enemies = JSON.parse(JSON.stringify(currentLevel.enemies));
+  goal = { ...currentLevel.goal, w: 30, h: 87 };
   
   player.respawnX = 80;
   player.respawnY = 260;
@@ -164,9 +191,29 @@ function resetPlayer() {
   player.invulnerable = 0;
 }
 
+function showMenu() {
+  game.gameState = 'menu';
+  overlay.innerHTML = `
+    <div class="menu-container">
+      <h1 class="menu-title">🦓 Ziggy's Sky Adventure 🦓</h1>
+      <p class="menu-subtitle">Help our cute zebra friend jump through three amazing levels!</p>
+      <div class="menu-description">
+        <p>💫 <strong>Sky Sprint</strong> - Start in the beautiful clouds</p>
+        <p>🏔️ <strong>Mountain Maze</strong> - Navigate the rocky peaks</p>
+        <p>👑 <strong>Cloud Kingdom</strong> - Reach the mystical kingdom!</p>
+      </div>
+      <p class="menu-controls">Use <strong>A/D</strong> or <strong>Arrow Keys</strong> to move<br/>Press <strong>W</strong> or <strong>Space</strong> to jump<br/>Land on enemies to defeat them!</p>
+      <button id="startButton" class="menu-btn">Start Adventure!</button>
+    </div>
+  `;
+  document.getElementById('startButton').addEventListener('click', startGame);
+  overlay.classList.add('visible');
+}
+
 function startGame() {
   game.running = true;
   game.won = false;
+  game.gameState = 'playing';
   game.timer = 0;
   game.levelMessage = '';
   player.lives = 3;
@@ -189,10 +236,12 @@ function showOverlay(title, message, buttonText = 'Play Again') {
     <button id="startButton">${buttonText}</button>
   `;
   document.getElementById('startButton').addEventListener('click', () => {
-    if (buttonText === 'Next Level') {
+    if (buttonText === 'Next Level →') {
       nextLevel();
-    } else {
-      startGame();
+    } else if (buttonText === 'Play Again') {
+      showMenu();
+    } else if (buttonText === 'Restart') {
+      showMenu();
     }
   });
   overlay.classList.add('visible');
@@ -214,24 +263,24 @@ function rectsIntersect(a, b) {
 function handleInput() {
   if (!game.running || game.won) return;
 
-  if (keys['ArrowLeft'] || keys['a']) {
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
     player.vx -= 0.75;
     player.facing = -1;
   }
 
-  if (keys['ArrowRight'] || keys['d']) {
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) {
     player.vx += 0.75;
     player.facing = 1;
   }
 
-  if ((keys['ArrowUp'] || keys['w'] || keys[' ']) && player.onGround) {
+  if ((keys['ArrowUp'] || keys['w'] || keys['W'] || keys[' ']) && player.onGround) {
     player.vy = JUMP_FORCE;
     player.onGround = false;
   }
 
   player.vx = clamp(player.vx, -MAX_SPEED, MAX_SPEED);
 
-  if (!keys['ArrowLeft'] && !keys['a'] && !keys['ArrowRight'] && !keys['d']) {
+  if (!keys['ArrowLeft'] && !keys['a'] && !keys['A'] && !keys['ArrowRight'] && !keys['d'] && !keys['D']) {
     player.vx *= 0.8;
     if (Math.abs(player.vx) < 0.1) player.vx = 0;
   }
@@ -327,7 +376,8 @@ function hurtPlayer(message) {
 
   if (player.lives <= 0) {
     game.running = false;
-    showOverlay('Game Over', `${message} Final score: ${player.score}.`, 'Restart');
+    game.gameState = 'gameOver';
+    showOverlay('Game Over 😢', `${message}\n\nFinal Score: ${player.score}`, 'Restart');
     return;
   }
 
@@ -345,11 +395,21 @@ function updateGoal() {
       game.won = true;
       player.score += 100;
       game.running = false;
+      game.gameState = 'levelComplete';
+      game.celebrationTimer = 0;
       
       if (game.currentLevelIndex < levels.length - 1) {
-        showOverlay('Level Complete!', `Fantastic job! Score: ${player.score}`, 'Next Level');
+        showOverlay(
+          '🎉 Level Complete! 🎉',
+          `${currentLevel.name}\n\nYou did it, Ziggy!\nScore: ${player.score}`,
+          'Next Level →'
+        );
       } else {
-        showOverlay('You Win!', `All levels complete! Final score: ${player.score}`, 'Play Again');
+        showOverlay(
+          '👑 You Won! 👑',
+          `You've completed all 3 levels!\n\n🌟 ULTIMATE CHAMPION 🌟\n\nFinal Score: ${player.score}`,
+          'Play Again'
+        );
       }
     }
   }
@@ -357,6 +417,7 @@ function updateGoal() {
 
 function nextLevel() {
   game.currentLevelIndex++;
+  game.gameState = 'playing';
   loadLevel(game.currentLevelIndex);
   resetPlayer();
   enemies.forEach((enemy) => {
@@ -387,14 +448,22 @@ function update() {
 }
 
 function drawBackground() {
-  ctx.fillStyle = '#bfe8ff';
+  const level = currentLevel || levels[0];
+  
+  ctx.fillStyle = level.bgColor1;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, level.bgColor2);
+  gradient.addColorStop(1, level.bgColor3);
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const skyShift = game.cameraX * 0.25;
 
   for (let i = 0; i < 8; i++) {
     const baseX = i * 170 - (skyShift % 170);
-    ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.fillStyle = level.cloudColor;
     ctx.beginPath();
     ctx.arc(baseX + 40, 90, 22, 0, Math.PI * 2);
     ctx.arc(baseX + 75, 78, 30, 0, Math.PI * 2);
@@ -404,12 +473,12 @@ function drawBackground() {
 
   for (let i = 0; i < 14; i++) {
     const hillX = i * 180 - (game.cameraX * 0.4) % 180;
-    ctx.fillStyle = '#9ad5a6';
+    ctx.fillStyle = level.hillColor1;
     ctx.beginPath();
     ctx.moveTo(hillX, canvas.height);
     ctx.quadraticCurveTo(hillX + 60, 320, hillX + 140, canvas.height);
     ctx.fill();
-    ctx.fillStyle = '#6aa96a';
+    ctx.fillStyle = level.hillColor2;
     ctx.beginPath();
     ctx.moveTo(hillX + 50, canvas.height);
     ctx.quadraticCurveTo(hillX + 96, 250, hillX + 170, canvas.height);
@@ -457,120 +526,117 @@ function drawEnemies() {
 
 function drawPlayer() {
   const x = player.x - game.cameraX;
-  
-  // Cute zebra character with stripes
   const isInvulnerable = player.invulnerable % 8 < 4;
   
-  // Body (white/light cream)
-  ctx.fillStyle = isInvulnerable ? '#fff5cc' : '#fffacd';
+  ctx.fillStyle = isInvulnerable ? '#fff9e6' : '#fffef0';
   ctx.beginPath();
-  ctx.ellipse(x + 16, player.y + 22, 14, 16, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 20, player.y + 28, 16, 18, 0, 0, Math.PI * 2);
   ctx.fill();
   
-  // Head (cute round shape)
-  ctx.fillStyle = isInvulnerable ? '#fff5cc' : '#fffacd';
+  ctx.fillStyle = isInvulnerable ? '#fff9e6' : '#fffef0';
   ctx.beginPath();
-  ctx.arc(x + 16, player.y + 8, 9, 0, Math.PI * 2);
+  ctx.arc(x + 20, player.y + 10, 11, 0, Math.PI * 2);
   ctx.fill();
   
-  // Ears (small rounded triangles)
-  ctx.fillStyle = isInvulnerable ? '#fff5cc' : '#fffacd';
+  ctx.fillStyle = isInvulnerable ? '#fff9e6' : '#fffef0';
   ctx.beginPath();
-  ctx.arc(x + 10, player.y + 2, 4, 0, Math.PI * 2);
+  ctx.arc(x + 12, player.y + 0, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(x + 22, player.y + 2, 4, 0, Math.PI * 2);
+  ctx.arc(x + 28, player.y + 0, 5, 0, Math.PI * 2);
   ctx.fill();
   
-  // Black stripes on body (vertical stripes)
+  ctx.fillStyle = '#ffb6d9';
+  ctx.beginPath();
+  ctx.arc(x + 12, player.y + 1, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x + 28, player.y + 1, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  
   ctx.fillStyle = '#000';
-  ctx.fillRect(x + 8, player.y + 10, 2, 20);
-  ctx.fillRect(x + 14, player.y + 10, 2, 20);
-  ctx.fillRect(x + 20, player.y + 10, 2, 20);
-  ctx.fillRect(x + 26, player.y + 10, 2, 20);
+  ctx.fillRect(x + 8, player.y + 12, 3, 24);
+  ctx.fillRect(x + 16, player.y + 12, 3, 24);
+  ctx.fillRect(x + 24, player.y + 12, 3, 24);
+  ctx.fillRect(x + 32, player.y + 12, 3, 24);
   
-  // Black stripes on head
-  ctx.fillRect(x + 12, player.y + 2, 2, 6);
-  ctx.fillRect(x + 20, player.y + 2, 2, 6);
+  ctx.fillRect(x + 14, player.y + 1, 3, 8);
+  ctx.fillRect(x + 26, player.y + 1, 3, 8);
   
-  // Eyes (big and cute)
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.arc(x + 12, player.y + 7, 2.5, 0, Math.PI * 2);
+  ctx.arc(x + 15, player.y + 8, 3.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(x + 20, player.y + 7, 2.5, 0, Math.PI * 2);
+  ctx.arc(x + 25, player.y + 8, 3.5, 0, Math.PI * 2);
   ctx.fill();
   
-  // Eye highlights (cute shine)
   ctx.fillStyle = '#fff';
   ctx.beginPath();
-  ctx.arc(x + 13, player.y + 6, 1, 0, Math.PI * 2);
+  ctx.arc(x + 16, player.y + 6.5, 1.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(x + 21, player.y + 6, 1, 0, Math.PI * 2);
+  ctx.arc(x + 26, player.y + 6.5, 1.5, 0, Math.PI * 2);
   ctx.fill();
   
-  // Snout/Muzzle (cute pink circle)
-  ctx.fillStyle = '#ffb6c1';
+  ctx.fillStyle = '#ffb6d9';
   ctx.beginPath();
-  ctx.arc(x + 16, player.y + 12, 3, 0, Math.PI * 2);
+  ctx.arc(x + 20, player.y + 14, 4, 0, Math.PI * 2);
   ctx.fill();
   
-  // Nose
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.arc(x + 16, player.y + 12, 1.2, 0, Math.PI * 2);
+  ctx.arc(x + 20, player.y + 14, 1.5, 0, Math.PI * 2);
   ctx.fill();
   
-  // Legs (simple rectangles)
-  ctx.fillStyle = isInvulnerable ? '#fff5cc' : '#fffacd';
-  ctx.fillRect(x + 6, player.y + 30, 4, 10);
-  ctx.fillRect(x + 14, player.y + 30, 4, 10);
-  ctx.fillRect(x + 20, player.y + 30, 4, 10);
-  ctx.fillRect(x + 28, player.y + 30, 4, 10);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(x + 20, player.y + 15, 2, 0, Math.PI);
+  ctx.stroke();
   
-  // Leg stripes
+  ctx.fillStyle = isInvulnerable ? '#fff9e6' : '#fffef0';
+  ctx.fillRect(x + 6, player.y + 38, 6, 12);
+  ctx.fillRect(x + 16, player.y + 38, 6, 12);
+  ctx.fillRect(x + 26, player.y + 38, 6, 12);
+  ctx.fillRect(x + 36, player.y + 38, 6, 12);
+  
   ctx.fillStyle = '#000';
-  ctx.fillRect(x + 6, player.y + 32, 4, 2);
-  ctx.fillRect(x + 14, player.y + 32, 4, 2);
-  ctx.fillRect(x + 20, player.y + 32, 4, 2);
-  ctx.fillRect(x + 28, player.y + 32, 4, 2);
+  ctx.fillRect(x + 6, player.y + 40, 6, 2.5);
+  ctx.fillRect(x + 16, player.y + 40, 6, 2.5);
+  ctx.fillRect(x + 26, player.y + 40, 6, 2.5);
+  ctx.fillRect(x + 36, player.y + 40, 6, 2.5);
   
-  // Tail (simple curved line)
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2.5;
   if (player.facing === 1) {
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(x + 30, player.y + 18);
-    ctx.quadraticCurveTo(x + 38, player.y + 15, x + 40, player.y + 22);
+    ctx.moveTo(x + 36, player.y + 20);
+    ctx.quadraticCurveTo(x + 48, player.y + 15, x + 50, player.y + 28);
     ctx.stroke();
   } else {
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(x + 2, player.y + 18);
-    ctx.quadraticCurveTo(x - 6, player.y + 15, x - 8, player.y + 22);
+    ctx.moveTo(x + 4, player.y + 20);
+    ctx.quadraticCurveTo(x - 8, player.y + 15, x - 10, player.y + 28);
     ctx.stroke();
   }
 }
 
 function drawHUD() {
-  ctx.fillStyle = 'rgba(10, 18, 30, 0.45)';
-  ctx.fillRect(16, 16, 360, 86);
+  ctx.fillStyle = 'rgba(10, 18, 30, 0.55)';
+  ctx.fillRect(16, 16, 400, 100);
   ctx.fillStyle = '#ecf7ff';
-  ctx.font = 'bold 24px Arial';
-  ctx.fillText(`Lives: ${player.lives}`, 30, 46);
-  ctx.fillText(`Score: ${player.score}`, 30, 78);
+  ctx.font = 'bold 28px Arial';
+  ctx.fillText(`❤️ ${player.lives}`, 30, 50);
+  ctx.fillText(`⭐ ${player.score}`, 30, 85);
   
-  // Level indicator
-  ctx.font = 'bold 18px Arial';
-  ctx.fillText(`${levels[game.currentLevelIndex].name}`, 250, 46);
+  ctx.font = 'bold 16px Arial';
+  ctx.fillText(currentLevel ? currentLevel.name : 'Level', 250, 50);
 
   if (game.levelMessage) {
-    ctx.fillStyle = 'rgba(255, 107, 107, 0.9)';
+    ctx.fillStyle = 'rgba(255, 107, 107, 0.95)';
     ctx.font = 'bold 18px Arial';
-    ctx.fillText(game.levelMessage, 280, 78);
+    ctx.fillText(game.levelMessage, 280, 85);
   }
 }
 
@@ -600,6 +666,11 @@ document.addEventListener('keyup', (event) => {
   keys[event.key] = false;
 });
 
-startButton.addEventListener('click', startGame);
-showOverlay('Sky Sprint', 'Use A/D or arrow keys to move, W/Space to jump. Defeat enemies by landing on top of them and reach the flag. Complete all 3 levels!', 'Start Game');
+startButton.addEventListener('click', () => {
+  if (game.gameState === 'menu') {
+    startGame();
+  }
+});
+
+showMenu();
 loop();
