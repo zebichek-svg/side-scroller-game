@@ -124,7 +124,7 @@ function startBackgroundMusic(melody) {
 const levels = [
   {
     name: 'Level 1: Sky Sprint',
-    description: "Ziggy's first adventure through the clouds!",
+    description: "Zara Zebra's first adventure through the clouds!",
     bgColor1: '#7ec8ff',
     bgColor2: '#d5eeff',
     bgColor3: '#f7fbff',
@@ -307,7 +307,7 @@ function showMenu() {
   game.gameState = 'menu';
   overlay.innerHTML = `
     <div class="menu-container">
-      <h1 class="menu-title">🦓 Ziggy's Sky Adventure 🦓</h1>
+      <h1 class="menu-title">🦓 Zara Zebra's Sky Adventure 🦓</h1>
       <p class="menu-subtitle">Help our cute zebra friend jump through three amazing levels!</p>
       <div class="menu-description">
         <p>💫 <strong>Sky Sprint</strong> - Start in the beautiful clouds</p>
@@ -523,7 +523,7 @@ function updateGoal() {
       if (game.currentLevelIndex < levels.length - 1) {
         showOverlay(
           '🎉 Level Complete! 🎉',
-          `${currentLevel.name}\n\nYou did it, Ziggy!\nScore: ${player.score}`,
+          `${currentLevel.name}\n\nYou did it, Zara Zebra!\nScore: ${player.score}`,
           'Next Level →'
         );
       } else {
