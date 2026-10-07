@@ -11,7 +11,116 @@ const JUMP_FORCE = -12.2;
 
 const keys = {};
 
-// Level definitions - each level has platforms, enemies, goal position, and theme
+const audio = {
+  ctx: null,
+  master: null,
+  musicGain: null,
+  musicTimer: null,
+  enabled: true
+};
+
+function ensureAudio() {
+  if (audio.ctx) {
+    if (audio.ctx.state === 'suspended') {
+      audio.ctx.resume();
+    }
+    return;
+  }
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    audio.enabled = false;
+    return;
+  }
+
+  audio.ctx = new AudioContextClass();
+  audio.master = audio.ctx.createGain();
+  audio.master.gain.value = 0.12;
+  audio.master.connect(audio.ctx.destination);
+
+  audio.musicGain = audio.ctx.createGain();
+  audio.musicGain.gain.value = 0.18;
+  audio.musicGain.connect(audio.master);
+}
+
+function playTone(frequency, duration, type = 'square', volume = 0.06, connectToMusic = false) {
+  if (!audio.enabled || !audio.ctx) return;
+
+  const oscillator = audio.ctx.createOscillator();
+  const gainNode = audio.ctx.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.value = frequency;
+
+  gainNode.gain.setValueAtTime(0.0001, audio.ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(volume, audio.ctx.currentTime + 0.02);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, audio.ctx.currentTime + duration);
+
+  oscillator.connect(gainNode);
+  if (connectToMusic) {
+    gainNode.connect(audio.musicGain);
+  } else {
+    gainNode.connect(audio.master);
+  }
+
+  oscillator.start();
+  oscillator.stop(audio.ctx.currentTime + duration + 0.03);
+}
+
+function playMenuSound() {
+  ensureAudio();
+  if (!audio.enabled) return;
+  playTone(392, 0.12, 'triangle', 0.05, false);
+  setTimeout(() => playTone(523.25, 0.12, 'triangle', 0.05, false), 90);
+}
+
+function playJumpSound() {
+  ensureAudio();
+  if (!audio.enabled) return;
+  playTone(440, 0.08, 'square', 0.05, false);
+  setTimeout(() => playTone(660, 0.09, 'triangle', 0.04, false), 70);
+}
+
+function playHitSound() {
+  ensureAudio();
+  if (!audio.enabled) return;
+  playTone(200, 0.14, 'sawtooth', 0.07, false);
+  setTimeout(() => playTone(120, 0.18, 'triangle', 0.05, false), 110);
+}
+
+function playWinSound() {
+  ensureAudio();
+  if (!audio.enabled) return;
+  playTone(523.25, 0.12, 'triangle', 0.06, false);
+  setTimeout(() => playTone(659.25, 0.12, 'triangle', 0.06, false), 120);
+  setTimeout(() => playTone(783.99, 0.18, 'triangle', 0.07, false), 220);
+}
+
+function stopBackgroundMusic() {
+  if (audio.musicTimer) {
+    clearInterval(audio.musicTimer);
+    audio.musicTimer = null;
+  }
+}
+
+function startBackgroundMusic(melody) {
+  ensureAudio();
+  if (!audio.enabled || !audio.ctx || !audio.musicGain) return;
+
+  stopBackgroundMusic();
+  let step = 0;
+
+  audio.musicTimer = setInterval(() => {
+    const note = melody[step % melody.length];
+    playTone(note, 0.16, 'triangle', 0.04, true);
+    if (step % 2 === 1) {
+      playTone(note / 2, 0.18, 'sine', 0.03, true);
+    }
+    step += 1;
+  }, 260);
+}
+
+// Level definitions with music vibes
 const levels = [
   {
     name: 'Level 1: Sky Sprint',
@@ -23,6 +132,7 @@ const levels = [
     cloudColor: 'rgba(255,255,255,0.70)',
     hillColor1: '#9ad5a6',
     hillColor2: '#6aa96a',
+    music: [392, 440, 523.25, 587.33, 523.25, 440],
     platforms: [
       { x: 0, y: 490, w: 520, h: 50 },
       { x: 620, y: 490, w: 360, h: 50 },
@@ -61,6 +171,7 @@ const levels = [
     cloudColor: 'rgba(255,250,240,0.60)',
     hillColor1: '#d2691e',
     hillColor2: '#8b4513',
+    music: [220, 261.63, 293.66, 349.23, 329.63, 293.66],
     platforms: [
       { x: 0, y: 490, w: 300, h: 50 },
       { x: 400, y: 490, w: 300, h: 50 },
@@ -101,6 +212,7 @@ const levels = [
     cloudColor: 'rgba(230,215,240,0.80)',
     hillColor1: '#9370db',
     hillColor2: '#8a5ec5',
+    music: [293.66, 349.23, 392, 440, 493.88, 440],
     platforms: [
       { x: 0, y: 490, w: 250, h: 50 },
       { x: 350, y: 350, w: 250, h: 50 },
@@ -206,11 +318,16 @@ function showMenu() {
       <button id="startButton" class="menu-btn">Start Adventure!</button>
     </div>
   `;
-  document.getElementById('startButton').addEventListener('click', startGame);
+  document.getElementById('startButton').addEventListener('click', () => {
+    playMenuSound();
+    startGame();
+  });
   overlay.classList.add('visible');
+  stopBackgroundMusic();
 }
 
 function startGame() {
+  ensureAudio();
   game.running = true;
   game.won = false;
   game.gameState = 'playing';
@@ -221,6 +338,7 @@ function startGame() {
   game.currentLevelIndex = 0;
   
   loadLevel(0);
+  startBackgroundMusic(levels[0].music);
   resetPlayer();
   enemies.forEach((enemy) => {
     enemy.alive = true;
@@ -276,6 +394,7 @@ function handleInput() {
   if ((keys['ArrowUp'] || keys['w'] || keys['W'] || keys[' ']) && player.onGround) {
     player.vy = JUMP_FORCE;
     player.onGround = false;
+    playJumpSound();
   }
 
   player.vx = clamp(player.vx, -MAX_SPEED, MAX_SPEED);
@@ -361,6 +480,7 @@ function updateEnemies() {
         enemy.alive = false;
         player.vy = -8.5;
         player.score += 10;
+        playWinSound();
       } else {
         hurtPlayer('An enemy struck you!');
       }
@@ -371,6 +491,7 @@ function updateEnemies() {
 function hurtPlayer(message) {
   if (player.invulnerable > 0 || !game.running) return;
 
+  playHitSound();
   player.lives -= 1;
   player.invulnerable = 100;
 
@@ -397,6 +518,7 @@ function updateGoal() {
       game.running = false;
       game.gameState = 'levelComplete';
       game.celebrationTimer = 0;
+      playWinSound();
       
       if (game.currentLevelIndex < levels.length - 1) {
         showOverlay(
@@ -419,6 +541,7 @@ function nextLevel() {
   game.currentLevelIndex++;
   game.gameState = 'playing';
   loadLevel(game.currentLevelIndex);
+  startBackgroundMusic(levels[game.currentLevelIndex].music);
   resetPlayer();
   enemies.forEach((enemy) => {
     enemy.alive = true;
@@ -668,6 +791,7 @@ document.addEventListener('keyup', (event) => {
 
 startButton.addEventListener('click', () => {
   if (game.gameState === 'menu') {
+    playMenuSound();
     startGame();
   }
 });
