@@ -245,6 +245,137 @@ const levels = [
       { x: 3000, y: 284, w: 30, h: 36, minX: 2800, maxX: 3100, vx: 1.4, alive: true }
     ],
     goal: { x: 3430, y: 403 }
+  },
+  {
+    name: 'Level 4: Sunset Ruins',
+    description: 'Ancient stone arches glow at sunset.',
+    bgColor1: '#ff9a5a',
+    bgColor2: '#ffc08a',
+    bgColor3: '#ffe7c6',
+    skyColor: '#ffd6a5',
+    cloudColor: 'rgba(255,255,255,0.45)',
+    hillColor1: '#d4895f',
+    hillColor2: '#9c5c3d',
+    music: [196, 246.94, 293.66, 329.63, 392, 329.63],
+    platforms: [
+      { x: 0, y: 490, w: 260, h: 50 },
+      { x: 340, y: 490, w: 250, h: 50 },
+      { x: 680, y: 490, w: 260, h: 50 },
+      { x: 1020, y: 490, w: 260, h: 50 },
+      { x: 1380, y: 490, w: 260, h: 50 },
+      { x: 1740, y: 490, w: 260, h: 50 },
+      { x: 2100, y: 490, w: 260, h: 50 },
+      { x: 2460, y: 490, w: 260, h: 50 },
+      { x: 2820, y: 490, w: 780, h: 50 },
+      { x: 130, y: 390, w: 150, h: 18 },
+      { x: 440, y: 330, w: 150, h: 18 },
+      { x: 760, y: 270, w: 150, h: 18 },
+      { x: 1080, y: 220, w: 180, h: 18 },
+      { x: 1420, y: 350, w: 170, h: 18 },
+      { x: 1780, y: 300, w: 170, h: 18 },
+      { x: 2120, y: 260, w: 170, h: 18 },
+      { x: 2480, y: 340, w: 180, h: 18 },
+      { x: 2880, y: 260, w: 170, h: 18 },
+      { x: 3220, y: 210, w: 180, h: 18 }
+    ],
+    enemies: [
+      { x: 470, y: 454, w: 30, h: 36, minX: 340, maxX: 590, vx: 1.4, alive: true },
+      { x: 860, y: 454, w: 30, h: 36, minX: 680, maxX: 940, vx: 1.3, alive: true },
+      { x: 1190, y: 454, w: 30, h: 36, minX: 1020, maxX: 1280, vx: 1.5, alive: true },
+      { x: 1510, y: 454, w: 30, h: 36, minX: 1380, maxX: 1640, vx: 1.6, alive: true },
+      { x: 1850, y: 454, w: 30, h: 36, minX: 1740, maxX: 2000, vx: 1.2, alive: true },
+      { x: 2230, y: 454, w: 30, h: 36, minX: 2100, maxX: 2360, vx: 1.5, alive: true },
+      { x: 2590, y: 454, w: 30, h: 36, minX: 2460, maxX: 2720, vx: 1.4, alive: true }
+    ],
+    goal: { x: 3430, y: 403 }
+  },
+  {
+    name: 'Level 5: Crystal Caverns',
+    description: 'Shimmering caves and sparkling ledges.',
+    bgColor1: '#3b728d',
+    bgColor2: '#5f9ea0',
+    bgColor3: '#d7f7ff',
+    skyColor: '#bfe8ea',
+    cloudColor: 'rgba(255,255,255,0.35)',
+    hillColor1: '#2a5c7a',
+    hillColor2: '#18485b',
+    music: [261.63, 329.63, 392, 523.25, 440, 349.23],
+    platforms: [
+      { x: 0, y: 490, w: 280, h: 50 },
+      { x: 360, y: 490, w: 220, h: 50 },
+      { x: 700, y: 490, w: 220, h: 50 },
+      { x: 1030, y: 490, w: 220, h: 50 },
+      { x: 1340, y: 490, w: 220, h: 50 },
+      { x: 1690, y: 490, w: 220, h: 50 },
+      { x: 2010, y: 490, w: 320, h: 50 },
+      { x: 2420, y: 490, w: 260, h: 50 },
+      { x: 2800, y: 490, w: 800, h: 50 },
+      { x: 120, y: 380, w: 150, h: 18 },
+      { x: 470, y: 310, w: 150, h: 18 },
+      { x: 820, y: 260, w: 150, h: 18 },
+      { x: 1120, y: 180, w: 170, h: 18 },
+      { x: 1430, y: 300, w: 170, h: 18 },
+      { x: 1720, y: 220, w: 170, h: 18 },
+      { x: 2050, y: 320, w: 180, h: 18 },
+      { x: 2400, y: 240, w: 180, h: 18 },
+      { x: 2890, y: 330, w: 180, h: 18 },
+      { x: 3250, y: 250, w: 180, h: 18 }
+    ],
+    enemies: [
+      { x: 500, y: 454, w: 30, h: 36, minX: 360, maxX: 580, vx: 1.8, alive: true },
+      { x: 830, y: 454, w: 30, h: 36, minX: 700, maxX: 920, vx: 1.5, alive: true },
+      { x: 1170, y: 454, w: 30, h: 36, minX: 1030, maxX: 1250, vx: 1.4, alive: true },
+      { x: 1460, y: 454, w: 30, h: 36, minX: 1340, maxX: 1560, vx: 1.7, alive: true },
+      { x: 1820, y: 454, w: 30, h: 36, minX: 1690, maxX: 1910, vx: 1.6, alive: true },
+      { x: 2180, y: 454, w: 30, h: 36, minX: 2010, maxX: 2320, vx: 1.3, alive: true },
+      { x: 2520, y: 454, w: 30, h: 36, minX: 2420, maxX: 2680, vx: 1.5, alive: true }
+    ],
+    goal: { x: 3430, y: 403 }
+  },
+  {
+    name: 'Level 6: Starfall Pass',
+    description: 'The final sky route under the stars.',
+    bgColor1: '#1d2a4d',
+    bgColor2: '#3c4f7d',
+    bgColor3: '#d9d7ff',
+    skyColor: '#c9c7ff',
+    cloudColor: 'rgba(255,255,255,0.28)',
+    hillColor1: '#4b5d94',
+    hillColor2: '#2b3a69',
+    music: [293.66, 392, 493.88, 587.33, 659.25, 587.33],
+    platforms: [
+      { x: 0, y: 490, w: 240, h: 50 },
+      { x: 320, y: 490, w: 220, h: 50 },
+      { x: 660, y: 490, w: 220, h: 50 },
+      { x: 980, y: 490, w: 220, h: 50 },
+      { x: 1300, y: 490, w: 220, h: 50 },
+      { x: 1640, y: 490, w: 220, h: 50 },
+      { x: 1980, y: 490, w: 220, h: 50 },
+      { x: 2320, y: 490, w: 220, h: 50 },
+      { x: 2660, y: 490, w: 220, h: 50 },
+      { x: 3000, y: 490, w: 600, h: 50 },
+      { x: 120, y: 390, w: 130, h: 18 },
+      { x: 430, y: 320, w: 140, h: 18 },
+      { x: 760, y: 250, w: 150, h: 18 },
+      { x: 1090, y: 210, w: 150, h: 18 },
+      { x: 1410, y: 300, w: 150, h: 18 },
+      { x: 1720, y: 240, w: 150, h: 18 },
+      { x: 2040, y: 200, w: 150, h: 18 },
+      { x: 2370, y: 280, w: 150, h: 18 },
+      { x: 2710, y: 230, w: 150, h: 18 },
+      { x: 3160, y: 300, w: 150, h: 18 }
+    ],
+    enemies: [
+      { x: 420, y: 454, w: 30, h: 36, minX: 320, maxX: 540, vx: 1.5, alive: true },
+      { x: 750, y: 454, w: 30, h: 36, minX: 660, maxX: 880, vx: 1.6, alive: true },
+      { x: 1080, y: 454, w: 30, h: 36, minX: 980, maxX: 1200, vx: 1.4, alive: true },
+      { x: 1410, y: 454, w: 30, h: 36, minX: 1300, maxX: 1520, vx: 1.7, alive: true },
+      { x: 1750, y: 454, w: 30, h: 36, minX: 1640, maxX: 1860, vx: 1.3, alive: true },
+      { x: 2090, y: 454, w: 30, h: 36, minX: 1980, maxX: 2200, vx: 1.5, alive: true },
+      { x: 2440, y: 454, w: 30, h: 36, minX: 2320, maxX: 2540, vx: 1.4, alive: true },
+      { x: 2780, y: 454, w: 30, h: 36, minX: 2660, maxX: 2880, vx: 1.8, alive: true }
+    ],
+    goal: { x: 3430, y: 403 }
   }
 ];
 
@@ -308,11 +439,14 @@ function showMenu() {
   overlay.innerHTML = `
     <div class="menu-container">
       <h1 class="menu-title">🦓 Zara Zebra's Sky Adventure 🦓</h1>
-      <p class="menu-subtitle">Help our cute zebra friend jump through three amazing levels!</p>
+      <p class="menu-subtitle">Help our cute zebra friend jump through six amazing levels!</p>
       <div class="menu-description">
         <p>💫 <strong>Sky Sprint</strong> - Start in the beautiful clouds</p>
         <p>🏔️ <strong>Mountain Maze</strong> - Navigate the rocky peaks</p>
-        <p>👑 <strong>Cloud Kingdom</strong> - Reach the mystical kingdom!</p>
+        <p>👑 <strong>Cloud Kingdom</strong> - Reach the mystical kingdom</p>
+        <p>🌅 <strong>Sunset Ruins</strong> - Cross the glowing desert ruins</p>
+        <p>💎 <strong>Crystal Caverns</strong> - Leap across sparkling caves</p>
+        <p>⭐ <strong>Starfall Pass</strong> - Finish beneath the night sky</p>
       </div>
       <p class="menu-controls">Use <strong>A/D</strong> or <strong>Arrow Keys</strong> to move<br/>Press <strong>W</strong> or <strong>Space</strong> to jump<br/>Land on enemies to defeat them!</p>
       <button id="startButton" class="menu-btn">Start Adventure!</button>
@@ -529,7 +663,7 @@ function updateGoal() {
       } else {
         showOverlay(
           '👑 You Won! 👑',
-          `You've completed all 3 levels!\n\n🌟 ULTIMATE CHAMPION 🌟\n\nFinal Score: ${player.score}`,
+          `You've completed all ${levels.length} levels!\n\n🌟 ULTIMATE CHAMPION 🌟\n\nFinal Score: ${player.score}`,
           'Play Again'
         );
       }
